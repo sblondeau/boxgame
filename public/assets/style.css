@@ -1,0 +1,38 @@
+body {
+    background-image: url('background.png');
+    color: white;
+}
+
+.map .col {
+    padding: 0;
+    background-image: url('floor.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100px;
+    width: 100px;
+    position: relative;
+}
+
+.col img {
+    position: absolute;
+    z-index: 1;
+    width: 100px;
+    height: 100px;
+}
+
+.player {
+    position:absolute;
+    z-index:2;
+}
+.playerN {
+    transform: rotate(-90deg);
+}
+
+.playerS {
+    transform: rotate(90deg);
+}
+
+.playerW {
+    transform: rotate(180deg);
+}
+

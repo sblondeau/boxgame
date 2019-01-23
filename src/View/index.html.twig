@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Box Game</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+          integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/style.css">
+
+</head>
+<body>
+<main class="container ">
+    <div class="row pt-2">
+        <div class="col-sm-5">
+            <h1>Box Game</h1>
+        </div>
+
+        <div class="col-sm-2">
+            <a class="btn btn-light" href="?start=1">Start</a>
+            {# TODO <span> Moves : {{ game.moves }}</span>#}
+        </div>
+    </div>
+    <div class="map">
+        {% include 'map.html.twig' %}
+    </div>
+</main>
+
+<script>
+    document.addEventListener('keypress', function (e) {
+        if (e.key === 'ArrowLeft') {
+            dir = 'W';
+        }
+        if (e.key === 'ArrowUp') {
+            dir = 'N';
+        }
+        if (e.key === 'ArrowRight') {
+            dir = 'E';
+        }
+        if (e.key === 'ArrowDown') {
+            dir = 'S';
+        }
+
+        fetch('?dir=' + dir)
+            .then(function (response) {
+                response.text().then(function (html) {
+                    document.querySelector('.map').innerHTML = html;
+                });
+            })
+    });
+</script>
+</body>
+</html>
