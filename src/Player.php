@@ -11,20 +11,26 @@ namespace App;
 
 class Player
 {
+    const DEFAULT_DIRECTION = 'E';
     private $x;
     private $y;
 
     private $direction;
+    private $hammer;
+
     /**
      * Player constructor.
      * @param int $x
      * @param int $y
      */
-    public function __construct(int $x = 0, int $y = 0, $direction='E')
+    public function __construct(int $x = 0, int $y = 0, $direction=self::DEFAULT_DIRECTION)
     {
         $this->setX($x);
         $this->setY($y);
         $this->setDirection($direction);
+        if (!$this->getHammer() === null) {
+            $this->setHammer(false);
+        }
     }
 
     /**
@@ -68,9 +74,9 @@ class Player
     /**
      * @return mixed
      */
-    public function getDirection()
+    public function getDirection() :string
     {
-        return $this->direction;
+        return $this->direction ?? self::DEFAULT_DIRECTION;
     }
 
     /**
@@ -87,4 +93,25 @@ class Player
     public function render() {
         return 'player.png';
     }
+
+    /**
+     * @return mixed
+     */
+    public function getHammer() :?bool
+    {
+        return $this->hammer;
+    }
+
+    /**
+     * @param boolean
+     * @return Player
+     */
+    public function setHammer(bool $hammer) :self
+    {
+        $this->hammer = $hammer;
+
+        return $this;
+    }
+
+
 }

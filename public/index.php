@@ -3,6 +3,7 @@
 use App\Box;
 use App\BoxGame;
 use App\Finish;
+use App\Hammer;
 use App\Hole;
 use App\Player;
 use App\Teleport;
@@ -20,13 +21,17 @@ if (!empty($_GET['start'])) {
     session_start();
 }
 
-$dir = $_GET['dir'] ?? null;
 
 $player = new Player($_SESSION['player']['x'] ?? 0, $_SESSION['player']['y'] ?? 0);
+
+$dir = $_GET['dir'] ?? null;
+
+
 
 if (empty($_SESSION['tiles'])) {
     $level = $_GET['level'] ?? 1;
     if ($level==1) {
+        $tiles[] = new Hammer(1, 0);
         $tiles[] = new Box(7, 0);
         $tiles[] = new Box(1, 1);
         $tiles[] = new Box(2, 1);
@@ -87,13 +92,25 @@ if (empty($_SESSION['tiles'])) {
 }
 
 $boxGame = new BoxGame($player, $tiles, $twig);
+
+$boxGame->getPlayer()->setHammer( $_SESSION['hammer'] ?? false);
+
+
+$boxGame->getPlayer()->setDirection($_SESSION['direction'] ?? null);
+
+if (!empty($_GET['destroy'])){
+    $boxGame->destroy();
+}
+
 if (!empty($dir)) {
     $boxGame->movePlayer($dir);
+    $_SESSION['direction'] = $dir;
 }
 
 $_SESSION['tiles'] = $boxGame->getTiles();
 $_SESSION['player']['x'] = $boxGame->getPlayer()->getX();
 $_SESSION['player']['y'] = $boxGame->getPlayer()->getY();
+$_SESSION['hammer'] = $boxGame->getPlayer()->getHammer();
 
 if (!$dir) {
     echo $twig->render('index.html.twig', [

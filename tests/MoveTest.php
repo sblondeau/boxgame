@@ -11,6 +11,7 @@ namespace Tests;
 
 use App\Box;
 use App\Finish;
+use App\Hammer;
 use App\Hole;
 use App\Teleport;
 use App\Wall;
@@ -250,6 +251,73 @@ class MoveTest extends TestCase
         $boxGame->movePlayer('N');
         $this->assertEquals(1, $boxGame->getPlayer()->getX());
         $this->assertEquals(0, $boxGame->getPlayer()->getY());
+    }
+
+    public function testGetHammer()
+    {
+        $player = new Player(4, 5);
+        $this->assertNull($player->getHammer());
+
+        $tiles[] = new Hammer(5, 5);
+        $boxGame = new BoxGame($player, $tiles);
+        $boxGame->movePlayer('E');
+        $this->assertTrue($player->getHammer());
+        $this->assertEquals(5, $boxGame->getPlayer()->getX());
+
+    }
+
+    public function testHammerMoveBox()
+    {
+        $player = new Player(4, 5);
+        $tiles[] = new Box(5, 5);
+        $tiles[] = new Hammer(6, 5);
+        $boxGame = new BoxGame($player, $tiles);
+        $boxGame->movePlayer('E');
+        $this->assertEquals(4, $boxGame->getPlayer()->getX());
+    }
+
+    public function testDestroyTile()
+    {
+        $player = new Player(4, 5);
+        $player->setHammer(true);
+        $box = new Box(5, 5);
+        $box2 = new Box(6, 5);
+        $tiles[] = $box;
+        $tiles[] = $box2;
+
+        $boxGame = new BoxGame($player, $tiles);
+        $boxGame->movePlayer('E');
+        $this->assertEquals(4, $boxGame->getPlayer()->getX());
+        $boxGame->destroy();
+        $boxGame->movePlayer('E');
+        $this->assertEquals(5, $boxGame->getPlayer()->getX());
+        $this->assertFalse($player->getHammer());
+
+    }
+
+
+    public function testDestroyAndMoveAcrossBox()
+    {
+        $player = new Player(4, 5);
+        $player->setHammer(true);
+
+        $box = new Box(5, 5);
+        $box2 = new Box(6, 5);
+        $tiles[] = $box;
+        $tiles[] = $box2;
+
+        $boxGame = new BoxGame($player, $tiles);
+        $boxGame->destroy();
+        $boxGame->movePlayer('E');
+        $boxGame->destroy();
+
+        $this->assertEquals(5, $boxGame->getPlayer()->getX());
+        $player->setHammer(true);
+        $boxGame->movePlayer('E');
+        $boxGame->destroy();
+
+        $this->assertEquals(6, $boxGame->getPlayer()->getX());
+
     }
 
 }

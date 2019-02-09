@@ -8,17 +8,17 @@
 
 namespace App;
 
-class Box extends Tile
+class Hammer extends Tile
 {
     public function __construct(int $x = 0, int $y = 0)
     {
         parent::__construct($x, $y);
-        $this->setMovable(true);
-        $this->setTraversable(false);
+        $this->setMovable(false);
+        $this->setTraversable(true);
     }
 
     public function render(): string
     {
-        return !$this->isTraversable() ? 'box.png' : 'destroyedBox.png';
+        return 'hammer.png';
     }
 }

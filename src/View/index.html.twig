@@ -18,7 +18,7 @@
             <h1>Box Game</h1>
         </div>
 
-        <div class="col-sm-2">
+        <div class="col-sm-4">
             <a class="btn btn-light" href="?start=1">Start</a>
             {# TODO <span> Moves : {{ game.moves }}</span>#}
         </div>
@@ -30,16 +30,17 @@
 
 <script>
     document.addEventListener('keypress', function (e) {
-        if (e.key === 'ArrowLeft') {
+
+        if (e.key === 'ArrowLeft' || e.key==='q') {
             dir = 'W';
         }
-        if (e.key === 'ArrowUp') {
+        if (e.key === 'ArrowUp' || e.key==='z') {
             dir = 'N';
         }
-        if (e.key === 'ArrowRight') {
+        if (e.key === 'ArrowRight' || e.key==='d') {
             dir = 'E';
         }
-        if (e.key === 'ArrowDown') {
+        if (e.key === 'ArrowDown' || e.key==='s') {
             dir = 'S';
         }
 

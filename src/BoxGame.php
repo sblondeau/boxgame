@@ -67,6 +67,7 @@ class BoxGame
 
         $targetX = $this->getPlayer()->getX() + self::DIRECTIONS[$direction][0];
         $targetY = $this->getPlayer()->getY() + self::DIRECTIONS[$direction][1];
+
         $this->getPlayer()->setDirection($direction);
 
         $this->moveBoxIfExist($targetX, $targetY);
@@ -76,11 +77,11 @@ class BoxGame
             $this->getPlayer()->setY($targetY);
             $this->setMoves($this->getMoves() + 1);
         }
-
-        $this->teleportation();
+        $this->checkHammer();
+        $this->checkTeleport();
     }
 
-    public function teleportation()
+    private function checkTeleport()
     {
         $teleport = $this->getTile($this->getPlayer()->getX(), $this->getPlayer()->getY());
 
@@ -88,6 +89,15 @@ class BoxGame
                 $this->getPlayer()
                     ->setX($teleport->getDestination()->getX())
                     ->setY($teleport->getDestination()->getY());
+        }
+    }
+
+    private function checkHammer() :void
+    {
+        $tile = $this->getTile($this->getPlayer()->getX(), $this->getPlayer()->getY());
+        if ($tile instanceof Hammer) {
+            $this->getPlayer()->setHammer(true);
+            $this->removeTile($tile);
         }
     }
 
@@ -114,7 +124,7 @@ class BoxGame
 
 
 
-    /** check if the player can move to a position
+    /** check if the player can move a box to a position
      * @param int $x
      * @param int $y
      * @return bool
@@ -231,7 +241,9 @@ class BoxGame
      */
     public function isTraversable(int $x, int $y): bool
     {
-        return $this->isEmpty($x, $y) || ($this->getTile($x, $y) instanceof Tile && $this->getTile($x, $y)->isTraversable() === true);
+        return
+            $this->isEmpty($x, $y) ||
+            $this->getTile($x, $y) instanceof Tile && $this->getTile($x, $y)->isTraversable() === true;
     }
 
     /**
@@ -266,5 +278,29 @@ class BoxGame
         return $this->twig->render('map.html.twig', [
             'game' => $this
         ]);
+    }
+
+
+    /**
+     * destroy if x/y is a Destroyable tile and if player have the Hammer
+     * @param int $x
+     * @param int $y
+     */
+    public function destroy() :void
+    {
+        $box = $this->targetedTile();
+        if ($this->getPlayer()->getHammer() === true && $box instanceof Box) {
+            $box->setTraversable(true);
+            $box->setMovable(false);
+            $this->getPlayer()->setHammer(false);
+        }
+    }
+
+    private function targetedTile() :?Tile
+    {
+        $direction = $this->getPlayer()->getDirection();
+        $targetX = $this->getPlayer()->getX() + self::DIRECTIONS[$direction][0];
+        $targetY = $this->getPlayer()->getY() + self::DIRECTIONS[$direction][1];
+        return $this->getTile($targetX, $targetY);
     }
 }
