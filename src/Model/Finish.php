@@ -6,9 +6,9 @@
  * Time: 14:01
  */
 
-namespace App;
+namespace App\Model;
 
-class Hammer extends Tile
+class Finish extends Tile
 {
     public function __construct(int $x = 0, int $y = 0)
     {
@@ -19,6 +19,6 @@ class Hammer extends Tile
 
     public function render(): string
     {
-        return 'hammer.png';
+        return 'finish.png';
     }
 }

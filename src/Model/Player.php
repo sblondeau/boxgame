@@ -6,7 +6,7 @@
  * Time: 14:01
  */
 
-namespace App;
+namespace App\Model;
 
 
 class Player
@@ -32,6 +32,8 @@ class Player
             $this->setHammer(false);
         }
     }
+
+
 
     /**
      * @return int
@@ -90,9 +92,7 @@ class Player
         return $this;
     }
 
-    public function render() {
-        return 'player.png';
-    }
+
 
     /**
      * @return mixed
@@ -113,5 +113,8 @@ class Player
         return $this;
     }
 
-
+    public function render() :string
+    {
+        return $this->getHammer() ? 'playerHammer.png' : 'player.png';
+    }
 }

@@ -6,8 +6,7 @@
  * Time: 14:01
  */
 
-namespace App;
-
+namespace App\Model;
 
 class Hole extends Tile
 {

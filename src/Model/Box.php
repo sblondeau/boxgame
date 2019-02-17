@@ -6,19 +6,19 @@
  * Time: 14:01
  */
 
-namespace App;
+namespace App\Model;
 
-class Finish extends Tile
+class Box extends Tile
 {
     public function __construct(int $x = 0, int $y = 0)
     {
         parent::__construct($x, $y);
-        $this->setMovable(false);
-        $this->setTraversable(true);
+        $this->setMovable(true);
+        $this->setTraversable(false);
     }
 
     public function render(): string
     {
-        return 'finish.png';
+        return !$this->isTraversable() ? 'box.png' : 'destroyedBox.png';
     }
 }

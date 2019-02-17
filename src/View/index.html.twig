@@ -14,43 +14,31 @@
 <body>
 <main class="container ">
     <div class="row pt-2">
-        <div class="col-sm-5">
+        <div class="col-sm-4">
             <h1>Box Game</h1>
         </div>
-
         <div class="col-sm-4">
-            <a class="btn btn-light" href="?start=1">Start</a>
+            <form method="GET" id="formlevel">
+                <label for="level">Level</label>
+                <select name="level" id="level">
+                    {% for level in levels %}
+                        <option value="{{ level.id }}" {{ level.number==currentLevel.number ? 'selected' }}>{{ level.number }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+
             {# TODO <span> Moves : {{ game.moves }}</span>#}
         </div>
+        <div class="col-sm-4">
+            <a class="btn btn-light" href="?route=admin">Maker</a>
+        </div>
     </div>
+
     <div class="map">
         {% include 'map.html.twig' %}
     </div>
 </main>
 
-<script>
-    document.addEventListener('keypress', function (e) {
-
-        if (e.key === 'ArrowLeft' || e.key==='q') {
-            dir = 'W';
-        }
-        if (e.key === 'ArrowUp' || e.key==='z') {
-            dir = 'N';
-        }
-        if (e.key === 'ArrowRight' || e.key==='d') {
-            dir = 'E';
-        }
-        if (e.key === 'ArrowDown' || e.key==='s') {
-            dir = 'S';
-        }
-
-        fetch('?dir=' + dir)
-            .then(function (response) {
-                response.text().then(function (html) {
-                    document.querySelector('.map').innerHTML = html;
-                });
-            })
-    });
-</script>
+<script src="assets/events.js"></script>
 </body>
 </html>

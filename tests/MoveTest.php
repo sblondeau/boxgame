@@ -9,15 +9,15 @@
 namespace Tests;
 
 
-use App\Box;
-use App\Finish;
-use App\Hammer;
-use App\Hole;
-use App\Teleport;
-use App\Wall;
+use App\Model\Box;
+use App\Model\Finish;
+use App\Model\Hammer;
+use App\Model\Hole;
+use App\Model\Teleport;
+use App\Model\Wall;
 use PHPUnit\Framework\TestCase;
 use App\BoxGame;
-use App\Player;
+use App\Model\Player;
 
 class MoveTest extends TestCase
 {

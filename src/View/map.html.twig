@@ -1,7 +1,3 @@
-{% if game.player.hammer  %}
-    <a class="btn btn-danger" href="?destroy=1">Destroy</a>
-{% endif %}
-
 {% for y in 0.. constant('App\\BoxGame::MAX_Y_SIZE') %}
     <div class="row ">
         {% for x in 0.. constant('App\\BoxGame::MAX_X_SIZE') %}
@@ -17,6 +13,10 @@
     </div>
 {% endfor %}
 <div class="col-sm-12 text-right">
+    {% if game.player.hammer %}
+        Press <kbd>A</kbd> to destroy
+    {% endif %}
+
     {% if game.isWin %}
         WIN !
     {% endif %}

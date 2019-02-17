@@ -9,9 +9,18 @@
 namespace App;
 
 
+use App\Model\Box;
+use App\Model\Finish;
+use App\Model\Hammer;
+use App\Model\Hole;
+use App\Model\Player;
+use App\Model\Teleport;
+use App\Model\Tile;
+use SplObserver;
+use SplSubject;
+
 class BoxGame
 {
-
     const DIRECTIONS = [
         'N' => [0, -1],
         'S' => [0, 1],
@@ -55,6 +64,7 @@ class BoxGame
         $this->twig = $twig;
         $this->setMoves(0);
     }
+
 
     /**
      * @param string $direction

@@ -6,7 +6,7 @@
  * Time: 14:01
  */
 
-namespace App;
+namespace App\Model;
 
 
 class Wall extends Tile

@@ -6,7 +6,7 @@
  * Time: 00:09
  */
 
-namespace App;
+namespace App\Model;
 
 
 abstract class Tile
