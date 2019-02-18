@@ -11,15 +11,12 @@ namespace App;
 
 use App\Model\Box;
 use App\Model\Finish;
-use App\Model\Hammer;
 use App\Model\Hole;
 use App\Model\Player;
-use App\Model\Teleport;
 use App\Model\Tile;
-use SplObserver;
-use SplSubject;
+use \SplObserver;
 
-class BoxGame
+class BoxGame implements \SplSubject
 {
     const DIRECTIONS = [
         'N' => [0, -1],
@@ -41,11 +38,7 @@ class BoxGame
      */
     private $tiles;
 
-    /**
-     *
-     * @var
-     */
-    private $moves;
+    private $observers = [];
 
     /**
      * @var
@@ -57,14 +50,44 @@ class BoxGame
      * @param Player $player
      * @param array $tiles
      */
-    public function __construct(Player $player, array $tiles = [], \Twig_Environment $twig=null)
+    public function __construct(Player $player, array $tiles = [], \Twig_Environment $twig = null)
     {
         $this->setPlayer($player);
         $this->setTiles($tiles);
         $this->twig = $twig;
-        $this->setMoves(0);
+        foreach ($this->getTiles() as $tile) {
+            if ($tile instanceof SplObserver) {
+                $this->attach($tile);
+            }
+        }
     }
 
+    /**
+     * @return mixed
+     */
+    public function getTiles(): array
+    {
+        return $this->tiles;
+    }
+
+    /**
+     * @param mixed $tiles
+     * @return BoxGame
+     */
+    public function setTiles(array $tiles): self
+    {
+        $this->tiles = $tiles;
+
+        return $this;
+    }
+
+    /**
+     * @param SplObserver $observer
+     */
+    public function attach(\SplObserver $observer)
+    {
+        $this->observers[] = $observer;
+    }
 
     /**
      * @param string $direction
@@ -74,7 +97,6 @@ class BoxGame
         if (!array_key_exists($direction, self::DIRECTIONS)) {
             throw new \LogicException('Unknown direction');
         }
-
         $targetX = $this->getPlayer()->getX() + self::DIRECTIONS[$direction][0];
         $targetY = $this->getPlayer()->getY() + self::DIRECTIONS[$direction][1];
 
@@ -85,29 +107,7 @@ class BoxGame
         if ($this->isTraversable($targetX, $targetY) && !$this->isBorder($targetX, $targetY)) {
             $this->getPlayer()->setX($targetX);
             $this->getPlayer()->setY($targetY);
-            $this->setMoves($this->getMoves() + 1);
-        }
-        $this->checkHammer();
-        $this->checkTeleport();
-    }
-
-    private function checkTeleport()
-    {
-        $teleport = $this->getTile($this->getPlayer()->getX(), $this->getPlayer()->getY());
-
-        if ($teleport instanceof Teleport && $teleport->getDestination() instanceof Teleport) {
-                $this->getPlayer()
-                    ->setX($teleport->getDestination()->getX())
-                    ->setY($teleport->getDestination()->getY());
-        }
-    }
-
-    private function checkHammer() :void
-    {
-        $tile = $this->getTile($this->getPlayer()->getX(), $this->getPlayer()->getY());
-        if ($tile instanceof Hammer) {
-            $this->getPlayer()->setHammer(true);
-            $this->removeTile($tile);
+            $this->notify();
         }
     }
 
@@ -130,9 +130,6 @@ class BoxGame
 
         return $this;
     }
-
-
-
 
     /** check if the player can move a box to a position
      * @param int $x
@@ -191,25 +188,6 @@ class BoxGame
         return $tiles ?? [];
     }
 
-    /**
-     * @return mixed
-     */
-    public function getTiles(): array
-    {
-        return $this->tiles;
-    }
-
-    /**
-     * @param mixed $tiles
-     * @return BoxGame
-     */
-    public function setTiles(array $tiles): self
-    {
-        $this->tiles = $tiles;
-
-        return $this;
-    }
-
     /** Check is there is a tile or not
      * @param int $x
      * @param int $y
@@ -257,22 +235,13 @@ class BoxGame
     }
 
     /**
-     * @return int
+     *
      */
-    public function getMoves(): int
+    public function notify()
     {
-        return $this->moves;
-    }
-
-    /**
-     * @param int $moves
-     * @return BoxGame
-     */
-    public function setMoves(int $moves): BoxGame
-    {
-        $this->moves = $moves;
-
-        return $this;
+        foreach ($this->observers as $value) {
+            $value->update($this);
+        }
     }
 
     /**
@@ -283,20 +252,19 @@ class BoxGame
         return $this->getTile($this->getPlayer()->getX(), $this->getPlayer()->getY()) instanceof Finish;
     }
 
-    public function render() :string
+    public function render(): string
     {
         return $this->twig->render('map.html.twig', [
-            'game' => $this
+            'game' => $this,
         ]);
     }
-
 
     /**
      * destroy if x/y is a Destroyable tile and if player have the Hammer
      * @param int $x
      * @param int $y
      */
-    public function destroy() :void
+    public function destroy(): void
     {
         $box = $this->targetedTile();
         if ($this->getPlayer()->getHammer() === true && $box instanceof Box) {
@@ -306,11 +274,33 @@ class BoxGame
         }
     }
 
-    private function targetedTile() :?Tile
+    private function targetedTile(): ?Tile
     {
         $direction = $this->getPlayer()->getDirection();
         $targetX = $this->getPlayer()->getX() + self::DIRECTIONS[$direction][0];
         $targetY = $this->getPlayer()->getY() + self::DIRECTIONS[$direction][1];
+
         return $this->getTile($targetX, $targetY);
     }
+
+    /**
+     * @param SplObserver $observer
+     */
+    public function detach(\SplObserver $observer)
+    {
+        $key = array_search($observer, $this->observers, true);
+        if ($key) {
+            unset($this->observers[$key]);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getObservers(): array
+    {
+        return $this->observers;
+    }
+
+
 }

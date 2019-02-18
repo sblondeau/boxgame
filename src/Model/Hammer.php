@@ -8,6 +8,7 @@
 
 namespace App\Model;
 
+use App\BoxGame;
 use SplSubject;
 
 class Hammer extends Tile implements \SplObserver
@@ -25,16 +26,16 @@ class Hammer extends Tile implements \SplObserver
     }
 
     /**
-     * @param SplSubject $subject
+     * @param SplSubject|BoxGame $subject
      */
     public function update(SplSubject $subject)
     {
-        $tile = $this->getTile($this->getPlayer()->getX(), $this->getPlayer()->getY());
-        if ($tile instanceof Hammer) {
-            $this->getPlayer()->setHammer(true);
-            $this->removeTile($tile);
+        if ($subject->getPlayer()->getX() === $this->getX() && $subject->getPlayer()->getY() === $this->getY()) {
+            $subject->getPlayer()->setHammer(true);
+            $subject->removeTile($this);
         }
     }
+
 
 
 }

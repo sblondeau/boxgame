@@ -13,10 +13,13 @@ class Player
 {
     const DEFAULT_DIRECTION = 'E';
     private $x;
+    private $previousX;
     private $y;
+    private $previousY;
 
     private $direction;
     private $hammer;
+
 
     /**
      * Player constructor.
@@ -38,7 +41,7 @@ class Player
     /**
      * @return int
      */
-    public function getX(): int
+    public function getX(): ?int
     {
         return $this->x;
     }
@@ -49,6 +52,7 @@ class Player
      */
     public function setX(int $x): Player
     {
+        $this->setPreviousX($this->getX());
         $this->x = $x;
 
         return $this;
@@ -57,7 +61,7 @@ class Player
     /**
      * @return int
      */
-    public function getY(): int
+    public function getY(): ?int
     {
         return $this->y;
     }
@@ -68,6 +72,7 @@ class Player
      */
     public function setY(int $y): Player
     {
+        $this->setPreviousY($this->getY());
         $this->y = $y;
 
         return $this;
@@ -117,4 +122,45 @@ class Player
     {
         return $this->getHammer() ? 'playerHammer.png' : 'player.png';
     }
+
+    /**
+     * @return mixed
+     */
+    public function getPreviousX() :?int
+    {
+        return $this->previousX;
+    }
+
+    /**
+     * @param mixed $previousX
+     * @return Player
+     */
+    public function setPreviousX(?int $previousX) :self
+    {
+        $this->previousX = $previousX;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPreviousY() :?int
+    {
+        return $this->previousY;
+    }
+
+    /**
+     * @param mixed $previousY
+     * @return Player
+     */
+    public function setPreviousY(?int $previousY) :self
+    {
+        $this->previousY = $previousY;
+
+        return $this;
+    }
+
+
+
 }

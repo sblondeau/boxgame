@@ -249,6 +249,10 @@ class MoveTest extends TestCase
         $this->assertEquals(6, $boxGame->getPlayer()->getX());
         $this->assertEquals(6, $boxGame->getPlayer()->getY());
         $boxGame->movePlayer('N');
+        $this->assertEquals(6, $boxGame->getPlayer()->getX());
+        $this->assertEquals(6, $boxGame->getPlayer()->getY());
+        $boxGame->movePlayer('S');
+        $boxGame->movePlayer('N');
         $this->assertEquals(1, $boxGame->getPlayer()->getX());
         $this->assertEquals(0, $boxGame->getPlayer()->getY());
     }
