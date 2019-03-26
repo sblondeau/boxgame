@@ -12,6 +12,7 @@ namespace App;
 use App\Model\Box;
 use App\Model\Finish;
 use App\Model\Hole;
+use App\Model\Level;
 use App\Model\Player;
 use App\Model\Tile;
 use \SplObserver;
@@ -25,13 +26,12 @@ class BoxGame implements \SplSubject
         'W' => [-1, 0],
     ];
 
-    const MAX_X_SIZE = 9;
-    const MAX_Y_SIZE = 7;
-
     /**
      * @var
      */
     private $player;
+
+    private $level;
 
     /**
      * @var
@@ -50,11 +50,12 @@ class BoxGame implements \SplSubject
      * @param Player $player
      * @param array $tiles
      */
-    public function __construct(Player $player, array $tiles = [], \Twig_Environment $twig = null)
+    public function __construct(Player $player, Level $level, array $tiles = [], \Twig_Environment $twig = null)
     {
         $this->setPlayer($player);
         $this->setTiles($tiles);
         $this->twig = $twig;
+        $this->setLevel($level);
         foreach ($this->getTiles() as $tile) {
             if ($tile instanceof SplObserver) {
                 $this->attach($tile);
@@ -82,14 +83,6 @@ class BoxGame implements \SplSubject
     }
 
     /**
-     * @param SplObserver $observer
-     */
-    public function attach(\SplObserver $observer)
-    {
-        $this->observers[] = $observer;
-    }
-
-    /**
      * @param string $direction
      */
     public function movePlayer(string $direction): void
@@ -97,18 +90,29 @@ class BoxGame implements \SplSubject
         if (!array_key_exists($direction, self::DIRECTIONS)) {
             throw new \LogicException('Unknown direction');
         }
-        $targetX = $this->getPlayer()->getX() + self::DIRECTIONS[$direction][0];
-        $targetY = $this->getPlayer()->getY() + self::DIRECTIONS[$direction][1];
 
         $this->getPlayer()->setDirection($direction);
+        [$targetX, $targetY] = $this->playerTargetPosition();
 
-        $this->moveBoxIfExist($targetX, $targetY);
+        $this->moveBoxIfExist();
 
-        if ($this->isTraversable($targetX, $targetY) && !$this->isBorder($targetX, $targetY)) {
+        if ($this->isTraversable() && !$this->isBorder($targetX, $targetY)) {
             $this->getPlayer()->setX($targetX);
             $this->getPlayer()->setY($targetY);
             $this->notify();
         }
+
+    }
+
+    /**
+     * @return array
+     */
+    private function playerTargetPosition() :array
+    {
+        $direction = $this->getPlayer()->getDirection();
+        $targetX = $this->getPlayer()->getX() + self::DIRECTIONS[$direction][0];
+        $targetY = $this->getPlayer()->getY() + self::DIRECTIONS[$direction][1];
+        return [$targetX, $targetY];
     }
 
     /**
@@ -136,8 +140,12 @@ class BoxGame implements \SplSubject
      * @param int $y
      * @return bool
      */
-    private function moveBoxIfExist(int $x, int $y): void
+    private function moveBoxIfExist(): void
     {
+        $direction = $this->getPlayer()->getDirection();
+        $x = $this->getPlayer()->getX() + self::DIRECTIONS[$direction][0];
+        $y = $this->getPlayer()->getY() + self::DIRECTIONS[$direction][1];
+
         // get position n+2 of player (according to the move direction)
         $nextX = $x + ($x <=> $this->getPlayer()->getX());
         $nextY = $y + ($y <=> $this->getPlayer()->getY());
@@ -178,7 +186,6 @@ class BoxGame implements \SplSubject
      */
     public function getTilesArray(): array
     {
-        // TODO check if tile coord in MIN/MAX range and pass min/max as construct param ?
         foreach ($this->getTiles() as $tile) {
             if ($tile instanceof Tile) {
                 $tiles[$tile->getX()][$tile->getY()] = $tile;
@@ -205,7 +212,7 @@ class BoxGame implements \SplSubject
      */
     private function isBorder(int $x, int $y): bool
     {
-        return $x < 0 || $x > self::MAX_X_SIZE || $y < 0 || $y > self::MAX_Y_SIZE;
+        return $x < 0 || $x > $this->getLevel()->getSizeX() || $y < 0 || $y > $this->getLevel()->getSizeY();
     }
 
     /**
@@ -227,8 +234,10 @@ class BoxGame implements \SplSubject
      * @param int $y
      * @return bool
      */
-    public function isTraversable(int $x, int $y): bool
+    public function isTraversable(): bool
     {
+        [$x, $y] = $this->playerTargetPosition();
+
         return
             $this->isEmpty($x, $y) ||
             $this->getTile($x, $y) instanceof Tile && $this->getTile($x, $y)->isTraversable() === true;
@@ -252,6 +261,7 @@ class BoxGame implements \SplSubject
         return $this->getTile($this->getPlayer()->getX(), $this->getPlayer()->getY()) instanceof Finish;
     }
 
+
     public function render(): string
     {
         return $this->twig->render('map.html.twig', [
@@ -266,7 +276,7 @@ class BoxGame implements \SplSubject
      */
     public function destroy(): void
     {
-        $box = $this->targetedTile();
+        $box = $this->getTile(...$this->playerTargetPosition());
         if ($this->getPlayer()->getHammer() === true && $box instanceof Box) {
             $box->setTraversable(true);
             $box->setMovable(false);
@@ -274,14 +284,15 @@ class BoxGame implements \SplSubject
         }
     }
 
-    private function targetedTile(): ?Tile
-    {
-        $direction = $this->getPlayer()->getDirection();
-        $targetX = $this->getPlayer()->getX() + self::DIRECTIONS[$direction][0];
-        $targetY = $this->getPlayer()->getY() + self::DIRECTIONS[$direction][1];
 
-        return $this->getTile($targetX, $targetY);
+    /**
+     * @param SplObserver $observer
+     */
+    public function attach(\SplObserver $observer)
+    {
+        $this->observers[] = $observer;
     }
+
 
     /**
      * @param SplObserver $observer
@@ -301,6 +312,26 @@ class BoxGame implements \SplSubject
     {
         return $this->observers;
     }
+
+    /**
+     * @return Level
+     */
+    public function getLevel(): Level
+    {
+        return $this->level;
+    }
+
+    /**
+     * @param Level $level
+     * @return BoxGame
+     */
+    public function setLevel(Level $level): BoxGame
+    {
+        $this->level = $level;
+
+        return $this;
+    }
+
 
 
 }

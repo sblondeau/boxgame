@@ -15,6 +15,8 @@ abstract class Tile
     private $x;
     private $y;
 
+    private $id;
+
     private $movable;
     private $traversable;
 
@@ -104,6 +106,26 @@ abstract class Tile
         return $this;
     }
 
+    public function getClassName() :string
+    {
+        return str_replace(__NAMESPACE__.'\\', '', static::class);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id): void
+    {
+        $this->id = $id;
+    }
 
     abstract public function render(): string;
 }

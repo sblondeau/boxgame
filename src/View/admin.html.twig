@@ -9,11 +9,37 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
           integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/style_admin.css">
 
 </head>
 <body>
 <main class="container ">
-admin
+    <h1>Level {{ level.number }}</h1>
+
+    <div class="map">
+        {% for y in 0.. level.getSizeY %}
+            <div class="row ">
+                {% for x in 0.. level.getSizeX %}
+                    <div class="col">
+                        {%- if level.tilesArray[x][y] -%}
+                            <img class="admin-img" src="assets/{{ level.tilesArray[x][y].render }}"/>
+                        {% endif %}
+                        <form method="POST" class="admin-form" id="admin-form-{{ x }}-{{ y }}">
+                            <input type="hidden" name="x" value="{{ x }}"/>
+                            <input type="hidden" name="y" value="{{ y }}"/>
+                            <select name="tileType" onchange="document.getElementById('admin-form-{{ x }}-{{ y }}').submit()">
+                                <option value="">Empty</option>
+                            {% for tileType in tilesType %}
+                                    <option value="{{ tileType }}" {{ level.tilesArray[x][y].className == tileType ? 'selected'  }}>{{ tileType }}</option>
+                            {% endfor %}
+                            </select>
+                            <button hidden>OK</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
 </main>
 
 </body>

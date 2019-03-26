@@ -34,6 +34,5 @@ document.addEventListener('keypress', function (e) {
 });
 
 document.getElementById('level').addEventListener('change', function (e) {
-    console.log('a');
     document.getElementById('formlevel').submit();
 });

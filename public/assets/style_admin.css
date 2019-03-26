@@ -1,0 +1,26 @@
+select {
+    background: rgba(0,0,0,0.5);
+    color:white;
+    border:none;
+    padding:0.3em;
+    appearance:none;
+    opacity:0.7;
+}
+
+select > option {
+    background: rgba(0,0,0,0.5);
+    color:white;
+
+}
+
+.admin-img {
+    position: absolute;
+    z-index: 1;
+    width: 100px;
+    height: 100px;
+}
+
+.admin-form {
+    position:absolute;
+    z-index:2;
+}

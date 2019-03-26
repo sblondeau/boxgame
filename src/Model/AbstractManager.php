@@ -16,6 +16,7 @@ abstract class AbstractManager
     public function __construct()
     {
         $this->pdo = new \PDO(DSN, USER, PASS);
+        $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION); // Set Errorhandling to Exception
     }
 
 

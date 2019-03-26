@@ -13,6 +13,7 @@ use App\Model\Box;
 use App\Model\Finish;
 use App\Model\Hammer;
 use App\Model\Hole;
+use App\Model\Level;
 use App\Model\Teleport;
 use App\Model\Wall;
 use PHPUnit\Framework\TestCase;
@@ -21,10 +22,20 @@ use App\Model\Player;
 
 class MoveTest extends TestCase
 {
+    private $level;
+    public function setUp()
+    {
+        $level = new Level();
+        $level->setNumber(1);
+        $level->setSizeX(9);
+        $level->setSizeY(7);
+        
+        $this->level = $level;
+    }
     public function testInitialPlayerPosition()
     {
         $player = new Player(0, 0);
-        $boxGame = new BoxGame($player);
+        $boxGame = new BoxGame($player, $this->level);
         $this->assertEquals(0, $boxGame->getPlayer()->getX());
         $this->assertEquals(0, $boxGame->getPlayer()->getY());
     }
@@ -32,7 +43,7 @@ class MoveTest extends TestCase
     public function testSimpleMovePlayer()
     {
         $player = new Player(2, 2);
-        $boxGame = new BoxGame($player);
+        $boxGame = new BoxGame($player, $this->level);
         $boxGame->movePlayer('N');
         $this->assertEquals(2, $boxGame->getPlayer()->getX());
         $this->assertEquals(1, $boxGame->getPlayer()->getY());
@@ -41,7 +52,7 @@ class MoveTest extends TestCase
     public function testMultipleMovePlayer()
     {
         $player = new Player(2, 2);
-        $boxGame = new BoxGame($player);
+        $boxGame = new BoxGame($player, $this->level);
         $boxGame->movePlayer('S');
         $this->assertEquals(2, $boxGame->getPlayer()->getX());
         $this->assertEquals(3, $boxGame->getPlayer()->getY());
@@ -64,7 +75,7 @@ class MoveTest extends TestCase
     {
         $player = new Player(2, 2);
         $box = new Box(3, 3);
-        $boxGame = new BoxGame($player, [$box]);
+        $boxGame = new BoxGame($player, $this->level, [$box]);
         $boxGame->movePlayer('S');
         $this->assertEquals(2, $boxGame->getPlayer()->getX());
         $this->assertEquals(3, $boxGame->getPlayer()->getY());
@@ -78,7 +89,7 @@ class MoveTest extends TestCase
         $player = new Player(2, 2);
         $boxes[] = new Box(3, 2);
         $boxes[] = new Box(4, 2);
-        $boxGame = new BoxGame($player, $boxes);
+        $boxGame = new BoxGame($player, $this->level, $boxes);
         $boxGame->movePlayer('E');
         $this->assertEquals(2, $boxGame->getPlayer()->getX());
         $this->assertEquals(2, $boxGame->getPlayer()->getY());
@@ -90,7 +101,7 @@ class MoveTest extends TestCase
         $boxes[] = new Box(3, 2);
         $boxes[] = new Box(5, 2);
 
-        $boxGame = new BoxGame($player, $boxes);
+        $boxGame = new BoxGame($player, $this->level, $boxes);
         $boxGame->movePlayer('E');
         $this->assertEquals(3, $boxGame->getPlayer()->getX());
         $this->assertEquals(2, $boxGame->getPlayer()->getY());
@@ -104,7 +115,7 @@ class MoveTest extends TestCase
     {
         $player = new Player(1, 1);
 
-        $boxGame = new BoxGame($player);
+        $boxGame = new BoxGame($player, $this->level);
 
         $boxGame->movePlayer('N');
         $this->assertEquals(1, $boxGame->getPlayer()->getX());
@@ -128,7 +139,7 @@ class MoveTest extends TestCase
         $player = new Player(2, 2);
         $boxes[] = new Box(2, 1);
 
-        $boxGame = new BoxGame($player, $boxes);
+        $boxGame = new BoxGame($player, $this->level, $boxes);
 
         $boxGame->movePlayer('N');
         $this->assertEquals(2, $boxGame->getPlayer()->getX());
@@ -160,7 +171,7 @@ class MoveTest extends TestCase
         $player = new Player(2, 2);
         $boxes[] = new Wall(2, 1);
 
-        $boxGame = new BoxGame($player, $boxes);
+        $boxGame = new BoxGame($player, $this->level, $boxes);
 
         $boxGame->movePlayer('N');
         $this->assertEquals(2, $boxGame->getPlayer()->getX());
@@ -172,7 +183,7 @@ class MoveTest extends TestCase
         $player = new Player(5, 4);
         $tiles[] = new Finish(6, 5);
 
-        $boxGame = new BoxGame($player, $tiles);
+        $boxGame = new BoxGame($player, $this->level, $tiles);
         $boxGame->movePlayer('S');
         $this->assertFalse($boxGame->isWin());
         $boxGame->movePlayer('E');
@@ -184,7 +195,7 @@ class MoveTest extends TestCase
         $this->expectException(\LogicException::class);
         $player = new Player();
 
-        $boxGame = new BoxGame($player);
+        $boxGame = new BoxGame($player, $this->level);
         $boxGame->movePlayer('A');
     }
 
@@ -193,7 +204,7 @@ class MoveTest extends TestCase
         $player = new Player(5, 5);
         $tiles[] = new Hole(6, 5);
 
-        $boxGame = new BoxGame($player, $tiles);
+        $boxGame = new BoxGame($player, $this->level, $tiles);
         $boxGame->movePlayer('E');
         $this->assertEquals(5, $boxGame->getPlayer()->getX());
 
@@ -205,7 +216,7 @@ class MoveTest extends TestCase
         $tiles[] = new Box(5, 5);
         $tiles[] = new Hole(6, 5);
 
-        $boxGame = new BoxGame($player, $tiles);
+        $boxGame = new BoxGame($player, $this->level, $tiles);
         $boxGame->movePlayer('E');
         $this->assertEquals(5, $boxGame->getPlayer()->getX());
         $boxGame->movePlayer('E');
@@ -223,7 +234,7 @@ class MoveTest extends TestCase
         $tiles[] = $teleport1;
         $tiles[] = $teleport2;
 
-        $boxGame = new BoxGame($player, $tiles);
+        $boxGame = new BoxGame($player, $this->level, $tiles);
         $boxGame->movePlayer('E');
         $this->assertEquals(6, $boxGame->getPlayer()->getX());
         $this->assertEquals(6, $boxGame->getPlayer()->getY());
@@ -244,7 +255,7 @@ class MoveTest extends TestCase
         $tiles[] = $teleport2;
         $tiles[] = new Wall(6,5);
 
-        $boxGame = new BoxGame($player, $tiles);
+        $boxGame = new BoxGame($player, $this->level, $tiles);
         $boxGame->movePlayer('E');
         $this->assertEquals(6, $boxGame->getPlayer()->getX());
         $this->assertEquals(6, $boxGame->getPlayer()->getY());
@@ -263,7 +274,7 @@ class MoveTest extends TestCase
         $this->assertNull($player->getHammer());
 
         $tiles[] = new Hammer(5, 5);
-        $boxGame = new BoxGame($player, $tiles);
+        $boxGame = new BoxGame($player, $this->level, $tiles);
         $boxGame->movePlayer('E');
         $this->assertTrue($player->getHammer());
         $this->assertEquals(5, $boxGame->getPlayer()->getX());
@@ -275,7 +286,7 @@ class MoveTest extends TestCase
         $player = new Player(4, 5);
         $tiles[] = new Box(5, 5);
         $tiles[] = new Hammer(6, 5);
-        $boxGame = new BoxGame($player, $tiles);
+        $boxGame = new BoxGame($player, $this->level, $tiles);
         $boxGame->movePlayer('E');
         $this->assertEquals(4, $boxGame->getPlayer()->getX());
     }
@@ -289,7 +300,7 @@ class MoveTest extends TestCase
         $tiles[] = $box;
         $tiles[] = $box2;
 
-        $boxGame = new BoxGame($player, $tiles);
+        $boxGame = new BoxGame($player, $this->level, $tiles);
         $boxGame->movePlayer('E');
         $this->assertEquals(4, $boxGame->getPlayer()->getX());
         $boxGame->destroy();
@@ -310,7 +321,7 @@ class MoveTest extends TestCase
         $tiles[] = $box;
         $tiles[] = $box2;
 
-        $boxGame = new BoxGame($player, $tiles);
+        $boxGame = new BoxGame($player, $this->level, $tiles);
         $boxGame->destroy();
         $boxGame->movePlayer('E');
         $boxGame->destroy();

@@ -27,7 +27,7 @@ class LevelManager
     public function findByNumber(int $number)
     {
         $stmt = $this->pdo->prepare('SELECT * FROM level where number=:number');
-        $stmt->bindParam('number', $number);
+        $stmt->bindValue('number', $number);
         $stmt->execute();
         $stmt->setFetchMode(\PDO::FETCH_CLASS, Level::class);
         return $stmt->fetch();

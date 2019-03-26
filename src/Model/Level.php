@@ -15,6 +15,9 @@ class Level
 
     private $number;
 
+    private $sizeX;
+    private $sizeY;
+
     /**
      * @return mixed
      */
@@ -38,16 +41,27 @@ class Level
     /**
      * @return mixed
      */
-    public function getTiles()
+    public function getTiles() :array
     {
         $tileManager = new TileManager();
         $tiles = $tileManager->findAll($this);
         foreach ($tiles as $tile) {
-            $tileType = 'App\Model\\' .ucfirst($tile['type']);
+            $tileType = 'App\Model\\' . ucfirst($tile['type']);
             $tile = (new  $tileType)->setX($tile['x'])->setY($tile['y']);
-            $tiles[] = $tile;
+            $tilesArray[] = $tile;
         }
-        return $tiles;
+
+        return $tilesArray ?? [];
+    }
+    /**
+     * @return mixed
+     */
+    public function getTilesArray() :array
+    {
+        foreach ($this->getTiles() as $tile) {
+            $tilesArray[$tile->getX()][$tile->getY()] = $tile;
+        }
+        return $tilesArray ?? [];
     }
 
 
@@ -69,6 +83,45 @@ class Level
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getSizeX()
+    {
+        return $this->sizeX;
+    }
+
+    /**
+     * @param mixed $sizeX
+     * @return Level
+     */
+    public function setSizeX($sizeX)
+    {
+        $this->sizeX = $sizeX;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSizeY()
+    {
+        return $this->sizeY;
+    }
+
+    /**
+     * @param mixed $sizeY
+     * @return Level
+     */
+    public function setSizeY($sizeY)
+    {
+        $this->sizeY = $sizeY;
+
+        return $this;
+    }
+
 
 
 }
