@@ -1,0 +1,11 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: sylvain
+ * Date: 10/02/19
+ * Time: 13:34
+ */
+
+define('DSN', 'mysql:dbname=database;host=localhost');
+define('USER', 'user');
+define('PASS', 'pass');

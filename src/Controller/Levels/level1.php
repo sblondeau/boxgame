@@ -7,7 +7,6 @@ use App\Model\Wall;
 use App\Model\Hole;
 use App\Model\Finish;
 
-$tiles[] = new Hammer(6, 7);
 $tiles[] = new Box(7, 0);
 $tiles[] = new Box(1, 1);
 $tiles[] = new Box(2, 1);
@@ -31,6 +30,8 @@ $tiles[] = new Box(9, 6);
 $tiles[] = new Box(1, 7);
 $tiles[] = new Box(4, 7);
 $tiles[] = new Box(5, 7);
+
+$tiles[] = new Hammer(6, 7);
 
 $tiles[] = new Wall(2, 0);
 $tiles[] = new Wall(0, 1);
