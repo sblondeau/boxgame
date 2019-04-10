@@ -10,7 +10,6 @@ namespace App;
 
 
 use App\Model\Box;
-use App\Model\Finish;
 use App\Model\Hole;
 use App\Model\Level;
 use App\Model\Player;
@@ -32,6 +31,10 @@ class BoxGame implements \SplSubject
     private $player;
 
     private $level;
+
+    private $win;
+
+
 
     /**
      * @var
@@ -254,13 +257,23 @@ class BoxGame implements \SplSubject
     }
 
     /**
-     * @return bool
+     * @return mixed
      */
-    public function isWin(): bool
+    public function getWin()
     {
-        return $this->getTile($this->getPlayer()->getX(), $this->getPlayer()->getY()) instanceof Finish;
+        return $this->win;
     }
 
+    /**
+     * @param mixed $win
+     * @return BoxGame
+     */
+    public function setWin($win)
+    {
+        $this->win = $win;
+
+        return $this;
+    }
 
     public function render(): string
     {

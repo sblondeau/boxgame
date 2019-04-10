@@ -7,10 +7,11 @@ use App\Model\Player;
 require '../vendor/autoload.php';
 require '../config/db.php';
 
+session_start();
+
 $loader = new Twig_Loader_Filesystem('../src/View');
 $twig = new Twig_Environment($loader, []);
 
-session_start();
 
 if(!empty($_GET['route']) && $_GET['route']=='admin') {
     $admin = new \App\Controller\AdminController($twig);
@@ -29,7 +30,6 @@ if (!empty($_GET['level'])) {
 $player = new Player($_SESSION['player']['x'] ?? 0, $_SESSION['player']['y'] ?? 0);
 
 $levelManager = new LevelManager();
-$levels = $levelManager->findAll();
 $level = $levelManager->findByNumber($_SESSION['level'] ?? 1);
 
 $tiles = $_SESSION['tiles'] ?? $level->getTiles();
@@ -57,7 +57,7 @@ $_SESSION['hammer'] = $boxGame->getPlayer()->getHammer();
 if (!$dir && empty($_GET['destroy'])) {
     echo $twig->render('index.html.twig', [
             'game' => $boxGame,
-            'levels' => $levels,
+            'levels' => $levelManager->findAll(),
             'currentLevel' => $level,
         ]
     );
